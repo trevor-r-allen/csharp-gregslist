@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using csharp_gregslist.DB;
 using csharp_gregslist.Models;
+using csharp_gregslist.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace csharp_gregslist.Controllers
@@ -10,12 +11,19 @@ namespace csharp_gregslist.Controllers
   [Route("api/[controller]")]
   public class CarsController : ControllerBase
   {
+
+    private readonly CarsService _ds;
+    public CarsController(CarsService ds)
+    {
+      _ds = ds;
+    }
+
     [HttpGet]
     public ActionResult<IEnumerable<Car>> Get()
     {
       try
       {
-        return Ok(FAKEDB.Cars);
+        return Ok(_ds.Get());
       }
       catch (Exception err)
       {
@@ -29,8 +37,8 @@ namespace csharp_gregslist.Controllers
     {
       try
       {
-        Car carToReturn = FAKEDB.Cars.Find(c => c.Id == carId);
-        return Ok(carToReturn);
+        Car car = _ds.Get(carId);
+        return Ok(car);
       }
       catch (Exception err)
       {
@@ -44,7 +52,7 @@ namespace csharp_gregslist.Controllers
     {
       try
       {
-        FAKEDB.Cars.Add(newCar);
+        Car car = _ds.Create(newCar);
         return Ok(newCar);
       }
       catch (Exception err)
@@ -59,11 +67,9 @@ namespace csharp_gregslist.Controllers
     {
       try
       {
-        Car carToEdit = FAKEDB.Cars.Find(c => c.Id == carId);
-        FAKEDB.Cars.Remove(carToEdit);
         editedCar.Id = carId;
-        FAKEDB.Cars.Add(editedCar);
-        return Ok(editedCar);
+        Car car = _ds.Edit(editedCar);
+        return Ok(car);
       }
       catch (Exception err)
       {
@@ -77,8 +83,7 @@ namespace csharp_gregslist.Controllers
     {
       try
       {
-        Car carToRemove = FAKEDB.Cars.Find(c => c.Id == carId);
-        FAKEDB.Cars.Remove(carToRemove);
+        _ds.Delete(carId);
         return Ok("Successfully Deleted");
       }
       catch (Exception err)
