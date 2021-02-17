@@ -40,7 +40,7 @@ namespace csharp_gregslist.Controllers
     }
 
     [HttpPost]
-    public ActionResult<Car> Create([FromBody], Car newCar)
+    public ActionResult<Car> Create([FromBody] Car newCar)
     {
       try
       {
